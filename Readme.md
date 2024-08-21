@@ -1,9 +1,11 @@
-### Implementation of Authentification management with NodeJS, MongoDB & ExpressJS.
+# Implementation of Authentification management with NodeJS, MongoDB & ExpressJS.
 
-# All the endpoints about authentifications user such as
+## All the endpoints about authentifications user such as
 
-## - sign up, login, logout, reset-password, update-password, forgot-password
+### - sign up, login, logout, reset-password, update-password, forgot-password
 
-# update-profile, upload-avatar, update-user, get-user-details, get-user-profile, delete-user, all-users, update-profile
+<div>
+###  update-profile, upload-avatar, update-user, get-user-details, get-user-profile, delete-user, all-users, update-profile
+</div>
 
 
