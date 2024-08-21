@@ -1,0 +1,37 @@
+// import { check, validationResult } from 'express-validator';
+// import ErrorResponse from '../utils/errorHandler.js';
+
+// export const validateRegister = [
+  // check('surname', 'Name is required').not().isEmpty(),
+//   check('firstname', 'Firstname is required').not().isEmpty(),
+//   check('username', 'Username is required').not().isEmpty(),
+//   check('date_of_birthday', 'Date of birthday is required').not().isEmpty(),
+//   check('place_of_birthday', 'Place of birthday is required').not().isEmpty(),
+//   check('email', 'Please include a valid email').isEmail(),
+//   check('phone', 'Phone is required').not().isEmpty(),
+//   check('country', 'Country is required').not().isEmpty(),
+//   check('nationality', 'Nationality is required').not().isEmpty(),
+//   check('contribuable_number', 'Numero contribuable is required').not().isEmpty(),
+//   check('language_preference', 'Language preference is required').not().isEmpty(),
+//   check('devise', 'Devise is required').not().isEmpty(),
+//   check('password', 'Password must be at least 6 characters long').isLength({ min: 6 }),
+//   (req, res, next) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return next(new ErrorResponse(errors.array()[0].msg, 400));
+//     }
+//     next();
+//   }
+// ];
+
+// export const validateLogin = [
+//   check('email', 'Please include a valid email').isEmail(),
+//   check('password', 'Password is required').not().isEmpty(),
+//   (req, res, next) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return next(new ErrorResponse(errors.array()[0].msg, 400));
+//     }
+//     next();
+//   }
+// ];
