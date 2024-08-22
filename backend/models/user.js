@@ -51,13 +51,18 @@ const userSchema = new mongoose.Schema(
                 validator: function(v) {
                     return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
                 },
-                message: props => `${props.value} n'est pas une adresse e-mail valide!`
+                message: props => `${props.value} not a valid e-mail !`
             }
         },
         confirmation_email: {
             type: String,
             required: [true, "Please enter your confirmation email, must be equal to your email field"],
-            unique: true,
+            validate: {
+              validator: function(v) {
+                return v === this.email;
+              },
+              message: props => `confirmation email entered is not equal to your email field !`
+            }
 
         },
         password: {
@@ -70,8 +75,13 @@ const userSchema = new mongoose.Schema(
         confirm_password: {
             type: String,
             required: [true, "Please enter your password"],
-            minLength: [6, "Your password must be longer than 6 characters"],
             select: false,
+            validate: {
+              validator: function(v) {
+                return v === this.password;
+              },
+              message: props => `confirmation password entered is not equal to your password field !`
+            }
         },
         avatar: {
           public_id: String,
@@ -89,7 +99,7 @@ const userSchema = new mongoose.Schema(
                 validator: function(v) {
                     return /^\+?\d{1,3}[- ]?\(?\d\)?[- ]?\d{1,14}$/.test(v);
                 },
-                message: props => `${props.value} n'est pas un numéro de téléphone valide!`
+                message: props => `${props.value} not a valide phone number!`
             }
 
         },
@@ -150,6 +160,14 @@ const userSchema = new mongoose.Schema(
               required: [true, "Veuillez entrer votre code BIC"],
               unique:true
             }
+          },
+          us_person_certification: {
+              type: Boolean,
+              default: false
+          },
+          verify: {
+              type: Boolean,
+              default: false
           },
         resetPasswordToken: String,
         resetPasswordExpire: Date,
