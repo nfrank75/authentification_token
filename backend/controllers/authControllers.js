@@ -36,13 +36,13 @@ export const registerUser = catchAsyncErrors(async (req, res, next) => {
   console.log(req.body);
 
   // Check if user already exists
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return res.status(400).json({
-      success: false,
-      message: 'User already exists',
-    });
-  }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User already exists',
+      });
+    }
 
   const user = await User.create({
     
