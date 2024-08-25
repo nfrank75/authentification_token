@@ -8,13 +8,13 @@ const userSchema = new mongoose.Schema(
     {
         surname: {
             type: String,
-            required: [true, "Please enter your surname"],
+            required: [false, "Please enter your surname"],
             minlength: [3, "Your name cannot less than 03 characters"],
             maxLength: [50, "Your name cannot exceed 50 characters"],
         },
         firstname: {
             type: String,
-            required: true,
+            required: false,
             minlength: [3, "Your name cannot less than 03 characters"],
             maxLength: [50, "Your name cannot exceed 50 characters"],
         },
@@ -26,9 +26,13 @@ const userSchema = new mongoose.Schema(
             unique: true,
 
         },
+        otp: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'OTP',
+        },
         date_of_birthday: {
             type: Date,
-            required: true,
+            required: false,
             validate: {
                 validator: function(v) {
                     // Vérifier que la date de naissance est antérieure à la date actuelle
@@ -39,7 +43,7 @@ const userSchema = new mongoose.Schema(
         },
         place_of_birthday: {
             type: String,
-            required: true,
+            required: false,
 
         },
         email: {
@@ -93,7 +97,7 @@ const userSchema = new mongoose.Schema(
         },
         phone: {
             type: String,
-            required: true,
+            required: false,
             unique:true,
             validate: {
                 validator: function(v) {
@@ -105,19 +109,19 @@ const userSchema = new mongoose.Schema(
         },
         country: {
             type: String,
-            required: true,
+            required: false,
             enum: countriesList
 
         },
         nationality: {
             type: String,
-            required: true,
+            required: false,
             enum: countriesList
 
         },
         contribuable_number: {
             type: String,
-            required: true,
+            required: false,
             unique: true,
 
         },
@@ -127,7 +131,7 @@ const userSchema = new mongoose.Schema(
         },
         devise: {
             type: String,
-            required: true,
+            required: false,
             default: "$",
 
         },
@@ -141,23 +145,23 @@ const userSchema = new mongoose.Schema(
         },
         mobile_money_number: {
             type: String,
-            required: true,
+            required: false,
             unique:true
 
         },
         bank_account: {
             bank_name: {
               type: String,
-              required: [true, "Veuillez entrer le nom de la banque"]
+              required: [false, "Veuillez entrer le nom de la banque"]
             },
             iban: {
               type: String,
-              required: [true, "Veuillez entrer votre numéro IBAN"],
+              required: [false, "Veuillez entrer votre numéro IBAN"],
               unique:true
             },
             bic: {
               type: String,
-              required: [true, "Veuillez entrer votre code BIC"],
+              required: [false, "Veuillez entrer votre code BIC"],
               unique:true
             }
           },

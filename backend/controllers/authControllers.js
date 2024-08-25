@@ -1,81 +1,109 @@
 import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
 import User from "../models/user.js";
+import OTP from "../models/otp.js";
+import UserPendingRegistration from "../models/userPendingRegistration .js";
 import { getResetPasswordTemplate } from "../utils/emailTemplates.js";
 import ErrorHandler from "../utils/errorHandler.js";
+import { delete_file, upload_file } from "../utils/cloudinary.js";
 import sendToken from "../utils/sendToken.js";
 import sendEmail from "../utils/sendEmail.js";
+import generateOTP from "../utils/generateOtp.js";
+import sendOTPEmail from "../utils/sendOtpEmail.js";
 import crypto from "crypto";
-import { delete_file, upload_file } from "../utils/cloudinary.js";
 
-// Register user   =>  /api/v1/register
+
+
+// Register user => /api/v1/register
 export const registerUser = catchAsyncErrors(async (req, res, next) => {
   const { 
-    surname,
-    firstname,
     username,
-    date_of_birthday,
-    place_of_birthday,
     email,
     confirmation_email,
     password,
     confirm_password,
-    avatar,
-    role,
-    phone,
-    country,
-    nationality,
-    contribuable_number,
-    preference_language,
-    devise,
-    pseudonym_sponsor,
-    us_person_certification,
-    mobile_money_number,
-    bank_account
-   } = req.body;
+  } = req.body;
 
-  console.log(req.body);
+  // Generate a new OTP
+  const otp = generateOTP();
+  const otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
 
-  // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'User already exists',
-      });
-    }
-
-  const user = await User.create({
-    
-    surname,
-    firstname,
-    username,
-    date_of_birthday,
-    place_of_birthday,
+  // Create the OTP code in the OTP table
+  const otpRecord = await OTP.create({
     email,
-    confirmation_email,
-    password,
-    confirm_password,
-    avatar,
-    role,
-    phone,
-    country,
-    nationality,
-    contribuable_number,
-    preference_language,
-    devise,
-    pseudonym_sponsor,
-    us_person_certification,
-    mobile_money_number,
-    bank_account
-
-
-
-
-
+    otp,
+    expiration_date: otpExpiration,
   });
 
-  sendToken(user, 201, res);
+  
+  // Stocker les informations temporairement
+  await UserPendingRegistration.create({
+    username,
+    email,
+    confirmation_email,
+    password,
+    confirm_password,
+    otp: otpRecord._id,
+  });
+
+  // Send the OTP email to the user
+  await sendOTPEmail(email, otp);
+
+  return res.status(200).json({
+    success: true,
+    message: 'Please enter the OTP sent to your email',
+  });
 });
+
+// Verify OTP => /api/v1/verify-otp
+export const verifyOTP = catchAsyncErrors(async (req, res, next) => {
+  const { email, otp } = req.body;
+
+  const userPendingRegistration = await UserPendingRegistration.findOne({ email });
+
+  // Find the OTP record
+  const otpRecord = await OTP.findOne({ email, otp });
+
+  console.log("=====otpRecord===", otpRecord);
+
+  
+
+  if (otpRecord && otpRecord.expiration_date > new Date()) {
+    // OTP is valid, create the user
+
+    const { username, email, confirmation_email, password, confirm_password, otp } = userPendingRegistration;
+
+    console.log("===userPendingRegistration===", userPendingRegistration);
+    
+
+    // Create the user and associate the OTP
+    const user = await User.create({
+      username,
+      email,
+      confirmation_email,
+      password,
+      confirm_password,
+      otp: otpRecord._id,
+    });
+
+    
+    await userPendingRegistration.deleteOne();
+
+    // Delete the OTP record
+    await otpRecord.deleteOne();
+
+    sendToken(user, 201, res);
+  } else {
+    // Delete the OTP record if it exists
+    if (otpRecord) {
+      await otpRecord.deleteOne();
+    }
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid or expired OTP',
+    });
+  }
+});
+
 
 // Login user   =>  /api/v1/login
 export const loginUser = catchAsyncErrors(async (req, res, next) => {
